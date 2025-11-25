@@ -1,5 +1,4 @@
 .env
-config.py
 webdrivers/
 __pycache__/
 *.pyc
