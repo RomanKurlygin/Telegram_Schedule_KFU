@@ -1,0 +1,9 @@
+.env
+config.py
+webdrivers/
+__pycache__/
+*.pyc
+*.log
+venv/
+.vscode/
+.idea/
