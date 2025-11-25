@@ -25,3 +25,4 @@ async def set_group(msg: types.Message):
     group_number = msg.text.strip()
     user_groups[msg.from_user.id] = group_number
     await msg.answer(f"Группа {group_number} сохранена ✅\nТеперь используйте команды /today, /tomorrow, /week")
+
