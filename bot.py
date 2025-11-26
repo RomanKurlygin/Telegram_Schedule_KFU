@@ -2,6 +2,7 @@ import asyncio
 from aiogram import Bot, Dispatcher, types
 from aiogram.filters import Command
 from config import TOKEN
+from scheduler.selenium_parser import get_schedule_kfu
 
 bot = Bot(token=TOKEN)
 dp = Dispatcher
@@ -25,4 +26,13 @@ async def set_group(msg: types.Message):
     group_number = msg.text.strip()
     user_groups[msg.from_user.id] = group_number
     await msg.answer(f"Группа {group_number} сохранена ✅\nТеперь используйте команды /today, /tomorrow, /week")
+
+@dp.message(Command("today"))
+async def today_cmd(msg: types.Message):
+    group = user_groups.get(msg.from_user.id)
+    if not group:
+        await msg.answer("Сначала отправьте номер группы")
+        return
+    schedule = get_schedule_kfu(group)
+    await msg.answer("📅 Расписание на сегодня:\n" + schedule)
 
