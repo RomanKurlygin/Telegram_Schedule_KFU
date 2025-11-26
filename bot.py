@@ -23,11 +23,20 @@ async def start(msg: types.Message):
         "/week — расписание на неделю"
     )
 
-@dp.message()
+@dp.message(lambda msg: not msg.text.startswith("/"))
 async def set_group(msg: types.Message):
     group_number = msg.text.strip()
+
+    if len(group_number) < 3 or " " in group_number:
+        await msg.answer("Отправьте корректный номер группы, например: 09-515")
+        return
+
     user_groups[msg.from_user.id] = group_number
-    await msg.answer(f"Группа {group_number} сохранена ✅\nТеперь используйте команды /today, /tomorrow, /week")
+    await msg.answer(
+        f"Группа {group_number} сохранена ✅\nТеперь используйте команды /today, /tomorrow, /week"
+    )
+
+
 
 @dp.message(Command("today"))
 async def today_cmd(msg: types.Message):
