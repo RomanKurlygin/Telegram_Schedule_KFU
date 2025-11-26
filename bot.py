@@ -7,7 +7,7 @@ from config import TOKEN
 from scheduler.selenium_parser import get_schedule_kfu
 
 bot = Bot(token=TOKEN)
-dp = Dispatcher
+dp = Dispatcher()
 
 user_groups = {}
 
