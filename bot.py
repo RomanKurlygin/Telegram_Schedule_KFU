@@ -23,6 +23,7 @@ async def start(msg: types.Message):
         "/week — расписание на неделю"
     )
 
+
 @dp.message(lambda msg: not msg.text.startswith("/"))
 async def set_group(msg: types.Message):
     group_number = msg.text.strip()
@@ -37,7 +38,6 @@ async def set_group(msg: types.Message):
     )
 
 
-
 @dp.message(Command("today"))
 async def today_cmd(msg: types.Message):
     group = user_groups.get(msg.from_user.id)
@@ -46,6 +46,7 @@ async def today_cmd(msg: types.Message):
         return
     schedule = get_schedule_kfu(group)
     await msg.answer("📅 Расписание на сегодня:\n" + schedule)
+
 
 @dp.message(Command("tomorrow"))
 async def tomorrow_cmd(msg: types.Message):
@@ -62,8 +63,6 @@ async def main():
     asyncio.create_task(daily_notification(bot, TEST_GROUP))
     await dp.start_polling(bot)
 
+
 if __name__ == "__main__":
     asyncio.run(main())
-
-
-
