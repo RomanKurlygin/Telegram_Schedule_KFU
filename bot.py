@@ -1,6 +1,8 @@
 import asyncio
 from aiogram import Bot, Dispatcher, types
 from aiogram.filters import Command
+
+from auto_post import daily_notification
 from config import TOKEN
 from scheduler.selenium_parser import get_schedule_kfu
 
@@ -44,5 +46,15 @@ async def tomorrow_cmd(msg: types.Message):
         return
     schedule = get_schedule_kfu(group)
     await msg.answer("📅 Расписание на завтра:\n" + schedule)
+
+
+async def main():
+    TEST_GROUP = "09-515"
+    asyncio.create_task(daily_notification(bot, TEST_GROUP))
+    await dp.start_polling(bot)
+
+if __name__ == "__main__":
+    asyncio.run(main())
+
 
 
