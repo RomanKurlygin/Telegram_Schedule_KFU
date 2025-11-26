@@ -1,4 +1,5 @@
 from selenium import webdriver
+from selenium.common import NoSuchElementException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
@@ -36,3 +37,13 @@ def get_schedule_kfu(group_number:str) -> str:
                 line = " | ".join(col.text for col in cols)
                 schedule_text += line + "\n"
 
+        if not schedule_text:
+            schedule_text = "Расписание для этой группы не найдено."
+
+        return schedule_text
+
+    except Exception as e:
+        return f"Ошибка при получении расписания: {e}"
+
+    finally:
+        driver.quit()
