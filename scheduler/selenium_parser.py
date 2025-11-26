@@ -22,3 +22,17 @@ def get_schedule_kfu(group_number:str) -> str:
         input_field.clear()
         input_field.send_keys(group_number)
 
+        search_button = driver.find_element(By.CSS_SELECTOR, "input[type=text]")
+        search_button.click()
+
+        driver.implicitly_wait(5)
+
+        table = driver.find_element(By.CSS_SELECTOR, "table")
+        rows = table.find_elements(By.TAG_NAME, "tr")
+        schedule_text = ""
+        for row in rows:
+            cols = row.find_elements(By.TAG_NAME, "td")
+            if cols:
+                line = " | ".join(col.text for col in cols)
+                schedule_text += line + "\n"
+
