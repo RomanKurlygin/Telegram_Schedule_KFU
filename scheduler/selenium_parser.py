@@ -1,85 +1,76 @@
 from selenium import webdriver
-from selenium.common.exceptions import NoSuchElementException, TimeoutException
 from selenium.webdriver.common.by import By
-from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from webdriver_manager.chrome import ChromeDriverManager
-from datetime import datetime, timedelta
+import datetime
 
-def get_schedule_kfu(group_number: str, day: str = "today") -> str:
+URL = "https://kpfu.ru/studentu/ucheba/raspisanie"
+
+def get_schedule_kfu(group: str, mode="today"):
     """
-    Получает расписание КФУ для указанной группы и дня.
-    day: "today", "tomorrow" или "week"
+    mode: 'today', 'tomorrow', 'week'
     """
     options = Options()
-    options.add_argument('--headless')
-    options.add_argument('--disable-gpu')
-    options.add_argument('--no-sandbox')
-    options.add_argument('--disable-dev-shm-usage')
-
-    service = Service(ChromeDriverManager().install())
-    driver = webdriver.Chrome(service=service, options=options)
+    options.add_argument("--headless")
+    options.add_argument("--disable-gpu")
+    options.add_argument("--no-sandbox")
+    driver = webdriver.Chrome(options=options)
 
     try:
-        driver.get("https://kpfu.ru/studentu/ucheba/raspisanie")
+        driver.get(URL)
 
-
-        input_field = WebDriverWait(driver, 15).until(
-            EC.presence_of_element_located((By.CSS_SELECTOR, "input[type='text']"))
+        # вводим номер группы
+        input_group = WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.ID, "p_group_name"))
         )
-        input_field.clear()
-        input_field.send_keys(group_number)
+        input_group.clear()
+        input_group.send_keys(group)
 
+        # нажимаем "Показать расписание"
+        show_button = driver.find_element(By.CSS_SELECTOR, "div[onclick='submit_group();']")
+        show_button.click()
 
-        search_button = WebDriverWait(driver, 15).until(
-            EC.element_to_be_clickable((By.CSS_SELECTOR, "button[type='submit']"))
-        )
-        driver.execute_script("arguments[0].click();", search_button)
-
-
-        table = WebDriverWait(driver, 15).until(
+        # ждём таблицу
+        table = WebDriverWait(driver, 10).until(
             EC.presence_of_element_located((By.CSS_SELECTOR, "table"))
         )
+
+        # собираем строки
         rows = table.find_elements(By.TAG_NAME, "tr")
-
-
+        days = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб"]
         schedule_text = ""
-        today_date = datetime.now().date()
-        tomorrow_date = today_date + timedelta(days=1)
 
-        for row in rows:
-            cols = row.find_elements(By.TAG_NAME, "td")
-            if not cols:
+        for row in rows[1:]:  # пропускаем заголовок
+            cells = row.find_elements(By.TAG_NAME, "td")
+            if not cells:
                 continue
+            time_cell = cells[0].text.strip()
+            day_cells = cells[1:]
 
+            for i, cell in enumerate(day_cells):
+                text = cell.text.strip()
+                if text:
+                    schedule_text += f"{days[i]} {time_cell}: {text}\n"
 
-            date_str = cols[0].text.strip()
-            try:
-                lesson_date = datetime.strptime(date_str, "%d.%m.%Y").date()
-            except ValueError:
-                lesson_date = None  # пропускаем строки без даты
-
-            line = " | ".join(col.text for col in cols)
-
-            if day == "today" and lesson_date == today_date:
-                schedule_text += line + "\n"
-            elif day == "tomorrow" and lesson_date == tomorrow_date:
-                schedule_text += line + "\n"
-            elif day == "week":
-                schedule_text += line + "\n"
+        # фильтр по today/tomorrow
+        if mode in ["today", "tomorrow"]:
+            weekday = datetime.datetime.today().weekday()  # 0-Пн ... 6-Вс
+            if mode == "tomorrow":
+                weekday = (weekday + 1) % 6  # только Пн-Сб
+            filtered_lines = []
+            for line in schedule_text.split("\n"):
+                if line.startswith(days[weekday]):
+                    filtered_lines.append(line)
+            schedule_text = "\n".join(filtered_lines) if filtered_lines else "Нет занятий."
 
         if not schedule_text:
-            schedule_text = "Расписание для этой группы не найдено."
+            schedule_text = "Нет занятий."
 
         return schedule_text
 
-    except TimeoutException:
-        return "Не удалось загрузить расписание. Попробуйте позже."
-    except NoSuchElementException:
-        return "Не удалось найти расписание на сайте КФУ."
     except Exception as e:
-        return f"Ошибка при получении расписания: {e}"
+        return f"Ошибка при получении расписания: {str(e)}"
+
     finally:
         driver.quit()
