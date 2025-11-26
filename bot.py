@@ -36,3 +36,13 @@ async def today_cmd(msg: types.Message):
     schedule = get_schedule_kfu(group)
     await msg.answer("📅 Расписание на сегодня:\n" + schedule)
 
+@dp.message(Command("tomorrow"))
+async def tomorrow_cmd(msg: types.Message):
+    group = user_groups.get(msg.from_user.id)
+    if not group:
+        await msg.answer("Сначала отправьте номер группы")
+        return
+    schedule = get_schedule_kfu(group)
+    await msg.answer("📅 Расписание на завтра:\n" + schedule)
+
+
