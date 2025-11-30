@@ -1,4 +1,6 @@
-webdriver-manager
 aiogram
 selenium
-pandas
+webdriver-manager
+beautifulsoup4
+lxml
+matplotlib
