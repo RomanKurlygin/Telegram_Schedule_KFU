@@ -6,6 +6,7 @@ def days_keyboard(group):
         [InlineKeyboardButton(text="📅 Вся неделя", callback_data=f"week_{group}")],
         [InlineKeyboardButton(text="⏰ Автоотправка", callback_data=f"auto_{group}"),
          InlineKeyboardButton(text="⛔ Стоп авто", callback_data=f"stopauto_{group}")],
-
+        [InlineKeyboardButton(text="💾 Сохранить", callback_data=f"save_{group}"),
+         InlineKeyboardButton(text="🔄 Обновить", callback_data=f"refresh_{group}")],
 
     ])
