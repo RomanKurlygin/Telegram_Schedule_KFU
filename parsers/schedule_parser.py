@@ -16,9 +16,7 @@ def get_schedule(group: str):
     driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
     driver.get("https://kpfu.ru/studentu/ucheba/raspisanie")
 
-    input_box = WebDriverWait(driver, 10).until(
-        EC.presence_of_element_located((By.ID, "p_group_name"))
-    )
+    input_box = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "p_group_name")))
     input_box.clear()
     input_box.send_keys(group)
     driver.execute_script("submit_group();")

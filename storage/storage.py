@@ -1,5 +1,8 @@
-import json, os
-from config import SAVE_FILE, AUTO_FILE
+import os
+import json
+
+SAVE_FILE = "saved_schedule.json"
+AUTO_FILE = "auto_users.json"
 
 def save_schedule(group, data):
     if os.path.exists(SAVE_FILE):
@@ -22,13 +25,7 @@ def load_auto_users():
     if not os.path.exists(AUTO_FILE):
         return []
     with open(AUTO_FILE, "r", encoding="utf-8") as f:
-        try:
-            data = json.load(f)
-            if isinstance(data, list):
-                return data
-        except json.JSONDecodeError:
-            pass
-    return []
+        return json.load(f)
 
 def save_auto_users(users):
     with open(AUTO_FILE, "w", encoding="utf-8") as f:

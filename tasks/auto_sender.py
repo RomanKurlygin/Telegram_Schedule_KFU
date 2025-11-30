@@ -1,12 +1,9 @@
-import asyncio, time
-from storage.save_load import load_auto_users
+import asyncio
+import time
 from parsers.schedule_parser import get_schedule_cached
 from aiogram import Bot
-from config import TOKEN
 
-bot = Bot(token=TOKEN)
-
-async def auto_sender(bot):
+async def auto_sender(bot: Bot, load_auto_users, users_file):
     while True:
         now = time.localtime()
         current_time = f"{now.tm_hour:02d}:{now.tm_min:02d}"
