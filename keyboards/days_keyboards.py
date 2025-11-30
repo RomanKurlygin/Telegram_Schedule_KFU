@@ -10,3 +10,4 @@ def days_keyboard(group):
          InlineKeyboardButton(text="🔄 Обновить", callback_data=f"refresh_{group}")],
         [InlineKeyboardButton(text="📊 Статистика", callback_data=f"stats_{group}")]
     ])
+    return kb
