@@ -38,7 +38,10 @@ async def send_schedule(msg: types.Message, mode="today"):
         return
 
     await msg.answer("⏳ Получаем расписание, подождите...")
-    schedule_text = get_schedule_kfu(group, mode=mode)
+
+    # Запускаем Selenium в отдельном потоке, чтобы не блокировать бота
+    schedule_text = await asyncio.to_thread(get_schedule_kfu, group, mode)
+
     await msg.answer(f"📅 Расписание на {mode}:\n{schedule_text}")
 
 @dp.message(Command("today"))

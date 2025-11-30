@@ -3,6 +3,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.keys import Keys
 import datetime
 
 URL = "https://kpfu.ru/studentu/ucheba/raspisanie"
@@ -15,6 +16,7 @@ def get_schedule_kfu(group: str, mode="today"):
     options.add_argument("--headless")
     options.add_argument("--disable-gpu")
     options.add_argument("--no-sandbox")
+    options.add_argument("--window-size=1920,1080")
     driver = webdriver.Chrome(options=options)
 
     try:
@@ -26,13 +28,13 @@ def get_schedule_kfu(group: str, mode="today"):
         )
         input_group.clear()
         input_group.send_keys(group)
+        input_group.send_keys(Keys.ENTER)  # триггер JS autocomplete
 
-        # нажимаем "Показать расписание"
-        show_button = driver.find_element(By.CSS_SELECTOR, "div[onclick='submit_group();']")
-        show_button.click()
+        # вызываем JS функцию submit_group()
+        driver.execute_script("submit_group();")
 
-        # ждём таблицу
-        table = WebDriverWait(driver, 10).until(
+        # ждём, пока таблица появится
+        table = WebDriverWait(driver, 15).until(
             EC.presence_of_element_located((By.CSS_SELECTOR, "table"))
         )
 
@@ -57,10 +59,10 @@ def get_schedule_kfu(group: str, mode="today"):
         if mode in ["today", "tomorrow"]:
             weekday = datetime.datetime.today().weekday()  # 0-Пн ... 6-Вс
             if mode == "tomorrow":
-                weekday = (weekday + 1) % 6  # только Пн-Сб
+                weekday = (weekday + 1) % 7  # Пн-Сб-Сб/Вс
             filtered_lines = []
             for line in schedule_text.split("\n"):
-                if line.startswith(days[weekday]):
+                if line.startswith(days[weekday % 6]):  # только Пн-Сб
                     filtered_lines.append(line)
             schedule_text = "\n".join(filtered_lines) if filtered_lines else "Нет занятий."
 
