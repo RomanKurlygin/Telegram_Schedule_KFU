@@ -1,6 +1,6 @@
 from aiogram import Router
 from parsers.schedule_parser import get_schedule_cached
-from keyboards.days_keyboard import days_keyboard
+from keyboards.days_keyboards import days_keyboard
 
 router = Router()
 
