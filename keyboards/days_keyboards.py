@@ -8,5 +8,5 @@ def days_keyboard(group):
          InlineKeyboardButton(text="⛔ Стоп авто", callback_data=f"stopauto_{group}")],
         [InlineKeyboardButton(text="💾 Сохранить", callback_data=f"save_{group}"),
          InlineKeyboardButton(text="🔄 Обновить", callback_data=f"refresh_{group}")],
-
+        [InlineKeyboardButton(text="📊 Статистика", callback_data=f"stats_{group}")]
     ])
