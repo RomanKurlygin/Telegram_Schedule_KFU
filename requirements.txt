@@ -1,3 +1,4 @@
+pandas
 aiogram
 selenium
 webdriver-manager

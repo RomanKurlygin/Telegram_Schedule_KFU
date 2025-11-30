@@ -1,6 +1,9 @@
 from aiogram import Router, types, Dispatcher
 from aiogram.filters import Command
-
+import pandas as pd
+import matplotlib.pyplot as plt
+import io
+from aiogram.types import BufferedInputFile
 from bot.keyboards import days_keyboard
 from parsers.schedule_parser import get_schedule_cached
 from storage.storage import save_schedule, load_saved_schedule, load_auto_users, save_auto_users
@@ -51,22 +54,32 @@ async def show_stats(call: types.CallbackQuery):
         await call.answer("❌ Расписание не найдено!", show_alert=True)
         return
 
-    import matplotlib.pyplot as plt
-    import io
-    from aiogram.types import BufferedInputFile
+    # --- Преобразуем расписание в DataFrame ---
+    data = []
+    for day, lessons in schedule.items():
+        for lesson in lessons:
+            data.append({"day": day, "lesson": lesson})
 
-    day_counts = {day: len(lessons) for day, lessons in schedule.items()}
+    if not data:
+        await call.answer("❌ Нет данных для статистики!", show_alert=True)
+        return
+
+    df = pd.DataFrame(data)
+
+    # --- Считаем количество пар по дням ---
+    day_counts = df.groupby("day").size().reindex(["Пн","Вт","Ср","Чт","Пт","Сб"], fill_value=0)
+
+    # --- Строим график ---
     plt.figure(figsize=(8,4))
-    days = list(day_counts.keys())
-    counts = list(day_counts.values())
-    plt.bar(days, counts, color='skyblue')
+    day_counts.plot(kind="bar", color="skyblue")
     plt.title(f"Количество пар по дням - {group}")
     plt.xlabel("День недели")
     plt.ylabel("Количество пар")
-    plt.grid(axis='y', linestyle='--', alpha=0.7)
+    plt.grid(axis="y", linestyle="--", alpha=0.7)
 
+    # --- Сохраняем график в буфер и отправляем ---
     buf = io.BytesIO()
-    plt.savefig(buf, format='png')
+    plt.savefig(buf, format="png")
     plt.close()
     buf.seek(0)
 
