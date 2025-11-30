@@ -22,7 +22,13 @@ def load_auto_users():
     if not os.path.exists(AUTO_FILE):
         return []
     with open(AUTO_FILE, "r", encoding="utf-8") as f:
-        return json.load(f)
+        try:
+            data = json.load(f)
+            if isinstance(data, list):
+                return data
+        except json.JSONDecodeError:
+            pass
+    return []
 
 def save_auto_users(users):
     with open(AUTO_FILE, "w", encoding="utf-8") as f:
