@@ -18,3 +18,9 @@ def save_schedule(group, data):
             data = json.load(f)
         return data.get(group)
 
+    def load_auto_users():
+        if not os.path.exists(AUTO_FILE):
+            return []
+        with open(AUTO_FILE, 'r', encoding="utf-8") as f:
+            return json.load(f)
+
