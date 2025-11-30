@@ -9,7 +9,6 @@ dp = Dispatcher()
 router = Router()
 dp.include_router(router)
 
-# Подключаем роутеры из файлов
 router.include_router(start_handler.router)
 router.include_router(day_handler.router)
 router.include_router(week_handler.router)
